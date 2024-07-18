@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId             String               @id @default(uuid())
+  userName           String
+  contactNo          String
+  email              String               @unique
+  password           String
+  role               String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @default(now())
+  UserProfile        UserProfile[]
+  VendorProfile      VendorProfile[]
+  AdminConfiguration AdminConfiguration[]
+  Document           Document[]
+}
+
+model UserProfile {
+  profileId       String     @id @default(uuid())
+  user            User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId          String
+  firstName       String
+  lastName        String
+  primaryLocation String
+  address         String
+  city            String
+  country         String
+  Location        Location[]
+}
+
+model VendorProfile {
+  vendorId           String        @id @default(uuid())
+  user               User          @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId             String
+  serviceArea        String
+  primaryLocation    String
+  status             String        @default("Inactive")
+  registrationStatus String        @default("Unverified")
+  vendorRating       Float
+  BankDetails        BankDetails[]
+  Location           Location[]
+}
+
+model AdminConfiguration {
+  configId       String   @id @default(uuid())
+  configKey      String
+  configValue    String
+  user           User     @relation(fields: [lastModifiedBy], references: [userId], onDelete: Cascade)
+  lastModifiedBy String
+  lastModifiedAt DateTime
+}
+
+model Role {
+  roleId   String @id @default(uuid())
+  roleName String
+}
+
+model Location {
+  locationId    String         @id @default(uuid())
+  userProfile   UserProfile?   @relation(fields: [profileId], references: [profileId], onDelete: Cascade)
+  profileId     String?
+  vendorProfile VendorProfile? @relation(fields: [vendorId], references: [vendorId], onDelete: Cascade)
+  vendorId      String?
+  latitude      String
+  longitude     String
+  locationName  String
+  houseDetails  String
+  areaDetails   String
+}
+
+model Document {
+  documentId        String   @id @default(uuid())
+  user              User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId            String
+  frontDocument     String
+  backDocument      String
+  frontDocumentType String
+  backDocumentType  String
+  documentName      String
+  status            Boolean  @default(false)
+  comments          String
+  isDeleted         Boolean  @default(false)
+  frontVerified     Boolean  @default(false)
+  backVerified      Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+}
+
+model BankDetails {
+  bankId        String        @id @default(uuid())
+  vendorProfile VendorProfile @relation(fields: [vendorId], references: [vendorId], onDelete: Cascade)
+  vendorId      String
+  bankName      String
+  accountName   String
+  accountNumber String
+  ifsc          String
+  accountType   String?
+  bankBranch    String?
+}

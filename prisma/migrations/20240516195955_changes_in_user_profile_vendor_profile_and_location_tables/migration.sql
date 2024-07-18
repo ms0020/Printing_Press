@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE "UserProfile" ALTER COLUMN "city" DROP DEFAULT,
+ALTER COLUMN "country" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "VendorProfile" ALTER COLUMN "accountName" DROP DEFAULT,
+ALTER COLUMN "accountNumber" DROP DEFAULT,
+ALTER COLUMN "bankName" DROP DEFAULT,
+ALTER COLUMN "ifsc" DROP DEFAULT;
